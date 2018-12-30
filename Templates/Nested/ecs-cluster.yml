@@ -1,0 +1,103 @@
+AWSTemplateFormatVersion: 2010-09-09
+Parameters:
+  KeyNameParameter:
+    Description: The EC2 Key Pair to allow SSH access to the instance
+    Type: 'AWS::EC2::KeyPair::KeyName'
+  EnvironmentType:
+    Description: Name your EnvironmentType with name you want.
+    Type: String
+    AllowedValues:
+      - Dev
+      - Prod
+  VpcId:
+    Type: String
+    Description: Select a VPC that allows instances access to the Internet.
+  SubnetId:
+    Type: String
+    Description: Select at two subnets in your selected VPC.
+  ClusterName:
+    Type: String
+    Description: Name your cluster with name you want.
+Mappings:
+  RegionMap:
+    us-east-1:
+      AMI: ami-045f1b3f87ed83659
+    us-east-2:
+      AMI: ami-0307f7ccf6ea35750
+    us-west-1:
+      AMI: ami-0285183bbef6224bd
+    us-west-2:
+      AMI: ami-01b70aea4161476b7
+Resources:
+  Cluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: !Ref ClusterName
+  LaunchConfigSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      VpcId: !Ref 'VpcId'
+      GroupDescription: Enable SSH access via port 22 and http via 80
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 22
+        ToPort: 22
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 32665
+        ToPort: 65000
+        CidrIp: 0.0.0.0/0
+  LaunchConfiguration:
+    Type: AWS::AutoScaling::LaunchConfiguration
+    Properties:
+      KeyName:
+        Ref: KeyNameParameter
+      ImageId: !FindInMap [RegionMap, !Ref "AWS::Region", AMI]
+      IamInstanceProfile: arn:aws:iam::012515449968:instance-profile/ecsInstanceRole
+      UserData:
+        Fn::Base64:
+          !Sub |
+            #!/bin/bash
+            sudo yum install -y ecs-init
+            sudo service docker start
+            sudo start ecs
+            echo ECS_CLUSTER=${ClusterName} >> /etc/ecs/ecs.config
+      SecurityGroups:
+      - Ref: "LaunchConfigSecurityGroup"
+      InstanceType: t2.micro
+  AutoScaling:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      AvailabilityZones:
+        Fn::GetAZs: ""
+      LaunchConfigurationName:
+        Ref: LaunchConfiguration
+      MinSize: "1"
+      MaxSize: "2"
+  ScheduledActionUp:
+    Type: AWS::AutoScaling::ScheduledAction
+    Properties:
+      AutoScalingGroupName: !Ref AutoScaling
+      MaxSize: 2
+      MinSize: 1
+      Recurrence: "0 14 * * 1-5"
+  ScheduledActionDown:
+    Type: AWS::AutoScaling::ScheduledAction
+    Properties:
+      AutoScalingGroupName: !Ref AutoScaling
+      MaxSize: 0
+      MinSize: 0
+      Recurrence: "0 22 * * 1-5"
+Outputs:
+  ecscluster:
+    Value: !Ref 'Cluster'
+  SecurityGroup:
+    Value: !Ref 'LaunchConfigSecurityGroup'
+  AutoScalingGroup:
+    Value: !Ref 'AutoScaling'
+  LaunchConfiguration:
+    Value: !Ref 'LaunchConfiguration'

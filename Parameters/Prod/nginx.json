@@ -1,0 +1,50 @@
+[
+  {
+    "ParameterKey": "VpcId",
+    "ParameterValue": "vpc-73cc6a09"
+  },
+  {
+   "ParameterKey": "KeyNameParameter",
+   "ParameterValue": "vennyec2"
+ },
+ {
+   "ParameterKey": "SubnetId",
+   "ParameterValue": "subnet-1a793515,subnet-6087dd2a,subnet-62ac3d4c,subnet-6f5bcc33,subnet-6fbf3508,subnet-bb24fa85"
+ },
+ {
+   "ParameterKey": "ApplicationLoadBalancerName",
+   "ParameterValue": "NginxLb"
+ },
+ {
+   "ParameterKey": "ClusterName",
+   "ParameterValue": "NginxCluster"
+ },
+ {
+   "ParameterKey": "EnvironmentType",
+   "ParameterValue": "Prod"
+ },
+ {
+   "ParameterKey": "ContainerPort",
+   "ParameterValue": "80"
+ },
+ {
+   "ParameterKey": "HostPort",
+   "ParameterValue": "0"
+ },
+ {
+   "ParameterKey": "ImageUrlwithVersion",
+   "ParameterValue": "idexcelinterns/karthik:latest"
+ },
+ {
+   "ParameterKey": "ServiceName",
+   "ParameterValue": "application"
+ },
+ {
+   "ParameterKey": "Priority",
+   "ParameterValue": "1"
+ },
+ {
+   "ParameterKey": "ALBListnerArn",
+   "ParameterValue": ""
+ }
+]

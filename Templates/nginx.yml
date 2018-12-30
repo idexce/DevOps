@@ -1,0 +1,78 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >
+  AWS cloudformation template for creating ECS infrastructure and service to host an application
+Parameters:
+  VpcId:
+    Type: String
+    Description: Select a VPC that allows instances access to the Internet.
+  KeyNameParameter:
+    Description: The EC2 Key Pair to allow SSH access to the instance
+    Type: String
+  SubnetId:
+    Type: String
+    Description: Select all the subnets in your selected VPC.
+  ApplicationLoadBalancerName:
+    Type: String
+    Description: Name your ApplicationLoadBalancerName with name you want.
+  ClusterName:
+    Type: String
+    Description: Name your cluster with name you want.
+  EnvironmentType:
+    Description: Name your EnvironmentType either Prod or Dev
+    Type: String
+    AllowedValues:
+      - Dev
+      - Prod
+  ContainerPort:
+    Type: Number
+    Description: specify your ContainerPort on which application runs.
+  HostPort:
+    Type: Number
+    Description: specify your hostport on which application runs.
+  ImageUrlwithVersion:
+    Type: String
+    Description: Provide url of docker image
+  ServiceName:
+    Description: Name of service, container and target group
+    Type: String
+  Priority:
+    Description: ALB rule priority for this service. Must be unique.
+    Type: Number
+  ALBListnerArn:
+    Description: ALBListnerArn. Must be unique.
+    Type: String
+    Default: ''
+Resources:
+  InfraStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://s3.amazonaws.com/nimmsaibucket/ecs-cluster.yml
+      TimeoutInMinutes: '60'
+      Parameters:
+        KeyNameParameter: !Ref KeyNameParameter
+        VpcId: !Ref VpcId
+        SubnetId: !Ref SubnetId
+        ClusterName: !Ref ClusterName
+        EnvironmentType: !Ref EnvironmentType
+  ServiceStack:
+    DependsOn: InfraStack
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://s3.amazonaws.com/nimmsaibucket/ecs-service.yml
+      TimeoutInMinutes: '60'
+      Parameters:
+        VpcId: !Ref VpcId
+        SubnetId: !Ref SubnetId
+        ClusterName: !Ref ClusterName
+        EnvironmentType: !Ref EnvironmentType
+        ApplicationLoadBalancerName: !Ref ApplicationLoadBalancerName
+        ContainerPort: !Ref ContainerPort
+        HostPort: !Ref HostPort
+        ImageUrlwithVersion: !Ref ImageUrlwithVersion
+        ServiceName: !Ref ServiceName
+        Priority: !Ref Priority
+        ALBListnerArn: !Ref ALBListnerArn
+Outputs:
+  ApplicationUrl:
+    Description: Url to access nginx application.
+    Value: !GetAtt ServiceStack.Outputs.LoadBalancerDNS

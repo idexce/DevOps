@@ -1,0 +1,169 @@
+
+
+AWSTemplateFormatVersion: 2010-09-09
+Parameters:
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Description: Select a VPC that allows instances access to the Internet.
+    Default: vpc-73cc6a09
+  SubnetId:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: Select at two subnets in your selected VPC.
+  ApplicationLoadBalancerName:
+    Type: String
+    Description: Name your ApplicationLoadBalancerName with name you want.
+  ClusterName:
+    Type: String
+    Description: Name your cluster with name you want.
+  EnvironmentType:
+    Description: Name your EnvironmentType with name you want.
+    Type: String
+    Default: Dev
+    AllowedValues:
+      - Dev
+      - Prod
+  ContainerPort:
+    Type: Number
+    Description: Name your ContainerPort with name you want.
+  HostPort:
+    Type: Number
+    Description: Name your HostPort with name you want.
+  ImageUrlwithVersion:
+    Type: String
+    Description: Name your cluster with name you want.
+  ServiceName:
+    Description: Used to identify task and path for load balancer rule
+    Type: String
+  Priority:
+    Description: ALB rule priority for this service. Must be unique.
+    Type: Number
+  ALBListnerArn:
+    Description: ALBListnerArn. Must be unique.
+    Type: String
+    Default: ''
+Conditions:
+  ResourcesTobecreated: !Equals [ !Ref ALBListnerArn, '' ]
+Resources:
+  ALBListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Condition: ResourcesTobecreated
+    Properties:
+      DefaultActions:
+      - Type: forward
+        TargetGroupArn:
+          Ref: TargetGroup
+      LoadBalancerArn:
+        Ref: ElasticLoadBalancer
+      Port: 80
+      Protocol: HTTP
+  ElasticLoadBalancer:
+    Condition: ResourcesTobecreated
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: !Join [ "-", [!Ref EnvironmentType, !Ref ApplicationLoadBalancerName] ]
+      Scheme: internet-facing
+      SecurityGroups:
+      - Ref: SecurityGroup
+      Subnets: !Ref 'SubnetId'
+  TargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      HealthCheckIntervalSeconds: 60
+      UnhealthyThresholdCount: 10
+      HealthCheckPath: /
+      Name: !Ref ServiceName
+      Port: 80
+      Protocol: HTTP
+      VpcId: !Ref 'VpcId'
+  ListenerRule:
+    Type: AWS::ElasticLoadBalancingV2::ListenerRule
+    Properties:
+      Actions:
+      - Type: forward
+        TargetGroupArn:
+          Ref: TargetGroup
+      Conditions:
+      - Field: path-pattern
+        Values:
+        - Fn::Sub: "/${ServiceName}/*"
+      ListenerArn: !If [ResourcesTobecreated, !Ref ALBListener, !Ref ALBListnerArn]
+      Priority:
+        Ref: Priority
+  SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Condition: ResourcesTobecreated
+    Properties:
+      VpcId: !Ref 'VpcId'
+      GroupDescription: Enable SSH access via port 22 and http via 80
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 22
+        ToPort: 22
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
+        CidrIp: 0.0.0.0/0
+  taskdefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      ContainerDefinitions:
+        -
+          Name: !Ref ServiceName
+          Image: !Ref ImageUrlwithVersion
+          Cpu: "10"
+          PortMappings:
+            -
+              ContainerPort: !Ref ContainerPort
+              HostPort: !Ref HostPort
+              Protocol: tcp
+          Memory: "300"
+          Essential: "true"
+  Service:
+    DependsOn: ListenerRule
+    Type: AWS::ECS::Service
+    Properties:
+      TaskDefinition:
+        Ref: taskdefinition
+      DesiredCount: 1
+      LoadBalancers:
+      - TargetGroupArn:
+          Ref: TargetGroup
+        ContainerPort: !Ref ContainerPort
+        ContainerName: !Ref ServiceName
+      Cluster:
+        Ref: ClusterName
+  healthyHostAlarm:
+    DependsOn: Service
+    Type: 'AWS::CloudWatch::Alarm'
+    Properties:
+      AlarmDescription: healthy hosts
+      MetricName: HealthyHostCount
+      Namespace: AWS/ApplicationELB
+      Statistic: Average
+      Period: 300
+      ActionsEnabled: true
+      EvaluationPeriods: 1
+      TreatMissingData: breaching
+      Threshold: 1
+      AlarmActions: [ "arn:aws:sns:us-east-1:012515449968:Infra_Monitor" ]
+      OKActions: [ "arn:aws:sns:us-east-1:012515449968:Infra_Monitor" ]
+      ComparisonOperator: LessThanThreshold
+      Dimensions:
+        - Name: TargetGroup
+          Value: !GetAtt TargetGroup.TargetGroupFullName
+        - Name: LoadBalancer
+          Value: !If [ResourcesTobecreated,!GetAtt ElasticLoadBalancer.LoadBalancerFullName, !Ref ApplicationLoadBalancerName]
+Outputs:
+  ECSALB:
+    Description: Template2_ALB
+    Value: !If [ResourcesTobecreated,!GetAtt ElasticLoadBalancer.LoadBalancerFullName, !Ref ApplicationLoadBalancerName]
+  taskdef:
+    Description: Template2_taskdefinition
+    Value: !Ref 'taskdefinition'
+  LoadBalancerDNS:
+    Description: Dns name for load balancers
+    Value: !If [ResourcesTobecreated, !GetAtt ElasticLoadBalancer.DNSName, !Ref ApplicationLoadBalancerName]
+  ALBListnerArn:
+    Description: Template2_ALBListnerArn
+    Value: !If [ResourcesTobecreated, !Ref ALBListener, !Ref ALBListnerArn]

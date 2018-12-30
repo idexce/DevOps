@@ -1,0 +1,70 @@
+[
+  {
+    "ParameterKey": "VpcId",
+    "ParameterValue": "vpc-73cc6a09"
+  },
+  {
+   "ParameterKey": "KeyNameParameter",
+   "ParameterValue": "vennyec2"
+ },
+ {
+   "ParameterKey": "SubnetId",
+   "ParameterValue": "subnet-1a793515,subnet-6087dd2a,subnet-62ac3d4c,subnet-6f5bcc33,subnet-6fbf3508,subnet-bb24fa85"
+ },
+ {
+   "ParameterKey": "ApplicationLoadBalancerName",
+   "ParameterValue": "MicroservicesLb"
+ },
+ {
+   "ParameterKey": "ClusterName",
+   "ParameterValue": "MicroservicesCluster"
+ },
+ {
+   "ParameterKey": "EnvironmentType",
+   "ParameterValue": "Prod"
+ },
+ {
+   "ParameterKey": "FirstContainerPort",
+   "ParameterValue": "8081"
+ },
+ {
+   "ParameterKey": "FirstHostPort",
+   "ParameterValue": "0"
+ },
+ {
+   "ParameterKey": "FirstImageUrlwithVersion",
+   "ParameterValue": "idexcelinterns/nodejs:latest"
+ },
+ {
+   "ParameterKey": "FirstServiceName",
+   "ParameterValue": "node"
+ },
+ {
+   "ParameterKey": "FirstPriority",
+   "ParameterValue": "1"
+ },
+ {
+   "ParameterKey": "FirstALBListnerArn",
+   "ParameterValue": ""
+ },
+ {
+   "ParameterKey": "SecondContainerPort",
+   "ParameterValue": "8123"
+ },
+ {
+   "ParameterKey": "SecondHostPort",
+   "ParameterValue": "0"
+ },
+ {
+   "ParameterKey": "SecondImageUrlwithVersion",
+   "ParameterValue": "idexcelinterns/saidev:latest"
+ },
+ {
+   "ParameterKey": "SecondServiceName",
+   "ParameterValue": "status"
+ },
+ {
+   "ParameterKey": "SecondPriority",
+   "ParameterValue": "2"
+ }
+]
