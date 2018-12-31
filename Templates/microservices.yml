@@ -61,7 +61,7 @@ Resources:
   InfraStack:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: https://github.com/idexcel-interns/DevOps/Templates/Nested/ecs-cluster.yml
+      TemplateURL: https://s3.amazonaws.com/nimmsaibucket/ecs-cluster.yml
       TimeoutInMinutes: '60'
       Parameters:
         KeyNameParameter: !Ref KeyNameParameter
@@ -73,7 +73,7 @@ Resources:
     DependsOn: InfraStack
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: https://github.com/idexcel-interns/DevOps/Templates/Nested/ecs-service.yml
+      TemplateURL: https://s3.amazonaws.com/nimmsaibucket/ecs-service.yml
       TimeoutInMinutes: '60'
       Parameters:
         VpcId: !Ref VpcId
@@ -91,7 +91,7 @@ Resources:
     DependsOn: InfraStack
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: https://github.com/idexcel-interns/DevOps/Templates/Nested/ecs-service.yml
+      TemplateURL: https://s3.amazonaws.com/nimmsaibucket/ecs-service.yml
       TimeoutInMinutes: '60'
       Parameters:
         VpcId: !Ref VpcId
