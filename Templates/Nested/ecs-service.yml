@@ -71,7 +71,7 @@ Resources:
       HealthCheckIntervalSeconds: 60
       UnhealthyThresholdCount: 10
       HealthCheckPath: /
-      Name: !Ref ServiceName
+      Name: !Join [ "-", [!Ref EnvironmentType, !Ref ServiceName] ]
       Port: 80
       Protocol: HTTP
       VpcId: !Ref 'VpcId'
@@ -85,7 +85,7 @@ Resources:
       Conditions:
       - Field: path-pattern
         Values:
-        - Fn::Sub: "/${ServiceName}/*"
+        - Fn::Sub: "/${ServiceName}*"
       ListenerArn: !If [ResourcesTobecreated, !Ref ALBListener, !Ref ALBListnerArn]
       Priority:
         Ref: Priority
