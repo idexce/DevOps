@@ -32,7 +32,7 @@ Resources:
   Cluster:
     Type: AWS::ECS::Cluster
     Properties:
-      ClusterName: !Ref ClusterName
+      ClusterName: !Join [ "-", [!Ref EnvironmentType, !Ref ClusterName] ]
   LaunchConfigSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
