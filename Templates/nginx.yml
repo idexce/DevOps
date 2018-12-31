@@ -46,7 +46,7 @@ Resources:
   InfraStack:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: https://s3.amazonaws.com/nimmsaibucket/ecs-cluster.yml
+      TemplateURL: https://github.com/idexcel-interns/DevOps/Templates/Nested/ecs-cluster.yml
       TimeoutInMinutes: '60'
       Parameters:
         KeyNameParameter: !Ref KeyNameParameter
@@ -58,7 +58,7 @@ Resources:
     DependsOn: InfraStack
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: https://s3.amazonaws.com/nimmsaibucket/ecs-service.yml
+      TemplateURL: https://github.com/idexcel-interns/DevOps/Templates/Nested/ecs-service.yml
       TimeoutInMinutes: '60'
       Parameters:
         VpcId: !Ref VpcId
@@ -75,4 +75,4 @@ Resources:
 Outputs:
   ApplicationUrl:
     Description: Url to access nginx application.
-    Value: !GetAtt ServiceStack.Outputs.LoadBalancerDNS
+    Value: !Join [ "/",[ !GetAtt ServiceStack.Outputs.LoadBalancerDNS, !Ref ServiceName]]
