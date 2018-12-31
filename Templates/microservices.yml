@@ -111,4 +111,4 @@ Outputs:
     Value: !Join [ "/",[ !GetAtt FirstServiceStack.Outputs.LoadBalancerDNS, !Ref FirstServiceName]]
   SecondApplicationUrl:
     Description: Url to access nginx application.
-    Value: !Join [ "/",[ !GetAtt FirstServiceStack.Outputs.LoadBalancerDNS, !Ref SecondServiceName]]
+    Value: !Join [ "/",[ !GetAtt FirstServiceStack.Outputs.LoadBalancerDNS, !Ref SecondServiceName, '']]
