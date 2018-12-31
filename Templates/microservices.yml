@@ -98,7 +98,7 @@ Resources:
         SubnetId: !Ref SubnetId
         ClusterName: !Ref ClusterName
         EnvironmentType: !Ref EnvironmentType
-        ApplicationLoadBalancerName: !Ref ApplicationLoadBalancerName
+        ApplicationLoadBalancerName: !GetAtt FirstServiceStack.Outputs.ECSALB
         ContainerPort: !Ref SecondContainerPort
         HostPort: !Ref SecondHostPort
         ImageUrlwithVersion: !Ref SecondImageUrlwithVersion
