@@ -131,8 +131,7 @@ Resources:
           Ref: TargetGroup
         ContainerPort: !Ref ContainerPort
         ContainerName: !Ref ServiceName
-      Cluster:
-        Ref: ClusterName
+      Cluster: !Join [ "-", [!Ref EnvironmentType, !Ref ClusterName] ]
   healthyHostAlarm:
     DependsOn: Service
     Type: 'AWS::CloudWatch::Alarm'
