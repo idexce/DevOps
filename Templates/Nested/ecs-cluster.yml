@@ -65,7 +65,7 @@ Resources:
             sudo yum install -y ecs-init
             sudo service docker start
             sudo start ecs
-            echo ECS_CLUSTER=${ClusterName} >> /etc/ecs/ecs.config
+            echo ECS_CLUSTER=${EnvironmentType}-${ClusterName} >> /etc/ecs/ecs.config
       SecurityGroups:
       - Ref: "LaunchConfigSecurityGroup"
       InstanceType: t2.micro
