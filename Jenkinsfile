@@ -4,6 +4,7 @@ node {
    }
    stage('Push Templates & Parameter files to S3') {
       sh 'aws s3 cp ./JenkinsTemplate.yml s3://idexcel-interns-devops/'
+      sh 'aws s3 cp ./Jenkinsfile s3://idexcel-interns-devops/'
       sh 'aws s3 cp ./Templates/Nested/ecs-cluster.yml s3://idexcel-interns-devops/Templates/Nested/ecs-cluster.yml'
       sh 'aws s3 cp ./Templates/Nested/ecs-service.yml s3://idexcel-interns-devops/Templates/Nested/ecs-service.yml'
       sh 'aws s3 cp ./Templates/${Stack}.yml s3://idexcel-interns-devops/Templates/${Stack}.yml'
