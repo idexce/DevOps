@@ -11,6 +11,10 @@ node {
       sh 'aws s3 cp ./Parameters/${EnvironmentType}/${Stack}.json s3://idexcel-interns-devops/Parameters/${EnvironmentType}/${Stack}.json'
    }
    stage('Stack Action'){
-         sh 'aws --region us-east-1 cloudformation ${Action} --stack-name ${EnvironmentType}-${Stack} --template-body file://./Templates/${Stack}.yml --parameters file://./Parameters/${EnvironmentType}/${Stack}.json'
+         sh 'aws --region us-east-1 cloudformation ${Action}-stack --stack-name ${EnvironmentType}-${Stack} --template-body file://./Templates/${Stack}.yml --parameters file://./Parameters/${EnvironmentType}/${Stack}.json'
+   }
+   
+   stage('Stack Status'){
+         sh 'aws --region us-east-1 cloudformation wait stack-${Action}-complete --stack-name ${EnvironmentType}-${Stack}'
    }
 }
