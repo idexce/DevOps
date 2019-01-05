@@ -1,4 +1,5 @@
 pipeline{
+agent any
 stages {
    stage('Pull code from GIT') {
                 checkout scm
