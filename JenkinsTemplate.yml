@@ -59,7 +59,7 @@ Resources:
             service docker start
             yum install git -y
             echo sudo service jenkins start >> /etc/rc.local
-            echo sudo service dokcer start >> /etc/rc.local
+            echo sudo service docker start >> /etc/rc.local
             sed -i 's/JENKINS_USER="jenkins"/JENKINS_USER="root"/g' /etc/sysconfig/jenkins
             chown -R root:root /var/lib/jenkins
             chown -R root:root /var/cache/jenkins
