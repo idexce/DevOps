@@ -49,8 +49,11 @@ Resources:
             sudo su
             yum update -y
             yum install wget -y
+            sudo wget http://repos.fedorapeople.org/repos/dchen/apache-maven/epel-apache-maven.repo -O /etc/yum.repos.d/epel-apache-maven.repo
+            sudo sed -i s/\$releasever/6/g /etc/yum.repos.d/epel-apache-maven.repo
+            sudo yum install -y apache-maven
             yum install java-1.8.0 -y
-            yum remove java-1.7.0-openjdk -y
+            sudo update-alternatives --config java
             wget -O /etc/yum.repos.d/jenkins.repo http://pkg.jenkins.io/redhat/jenkins.repo
             rpm --import https://pkg.jenkins.io/redhat/jenkins.io.key
             yum install jenkins -y
